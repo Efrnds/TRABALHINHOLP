@@ -45,6 +45,29 @@ public class RegistroUsoDAO {
         return query.getResultList();
     }
 
+    public int somarMinutosPorAlunoHoje(int alunoId) {
+        TypedQuery<Long> query = em.createQuery(
+                "SELECT COALESCE(SUM(r.duracaoMin), 0) FROM RegistroUso r " +
+                        "WHERE r.aluno.id = :id AND DATE(r.dataHora) = CURDATE()",
+                Long.class
+        );
+        query.setParameter("id", alunoId);
+        Long resultado = query.getSingleResult();
+        return resultado != null ? resultado.intValue() : 0;
+    }
+
+
+    public int contarRegistrosAtivosAgora() {
+        TypedQuery<Long> query = em.createQuery(
+                "SELECT COUNT(r) FROM RegistroUso r " +
+                        "WHERE r.dataHora <= CURRENT_TIMESTAMP " +
+                        "AND FUNCTION('TIMESTAMPADD', 'MINUTE', r.duracaoMin, r.dataHora) > CURRENT_TIMESTAMP",
+                Long.class
+        );
+        Long resultado = query.getSingleResult();
+        return resultado != null ? resultado.intValue() : 0;
+    }
+
 }
 
 

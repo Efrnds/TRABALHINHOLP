@@ -1,7 +1,8 @@
 package br.edu.ifpr.model.entity;
 
 import jakarta.persistence.*;
-import java.util.Date;
+
+import java.time.LocalDateTime;
 
 @Entity
 public class RegistroUso {
@@ -12,7 +13,7 @@ public class RegistroUso {
 
     @Basic
     @Temporal(TemporalType.DATE)
-    private Date dataHora;
+    private LocalDateTime dataHora;
 
     @Basic
     private int duracao_min;
@@ -33,11 +34,11 @@ public class RegistroUso {
         this.id = id;
     }
 
-    public Date getDataHora() {
+    public LocalDateTime getDataHora() {
         return dataHora;
     }
 
-    public void setDataHora(Date dataHora) {
+    public void setDataHora(LocalDateTime dataHora) {
         this.dataHora = dataHora;
     }
 
