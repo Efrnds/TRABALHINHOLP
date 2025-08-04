@@ -2,37 +2,35 @@ package br.edu.ifpr.dao;
 
 import br.edu.ifpr.model.entity.Aluno;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Repository
 public class AlunoDAO {
 
+    @PersistenceContext
     private EntityManager em;
 
-    public AlunoDAO(EntityManager em) {
-        this.em = em;
-    }
-
+    @Transactional
     public void salvar(Aluno aluno) {
-        em.getTransaction().begin();
         em.persist(aluno);
-        em.getTransaction().commit();
     }
 
+    @Transactional
     public void atualizar(Aluno aluno) {
-        em.getTransaction().begin();
         em.merge(aluno);
-        em.getTransaction().commit();
     }
 
+    @Transactional
     public void deletar(Aluno aluno) {
-        em.getTransaction().begin();
         if (!em.contains(aluno)) {
             aluno = em.merge(aluno);
         }
         em.remove(aluno);
-        em.getTransaction().commit();
     }
 
     public Aluno buscarPorId(int id) {

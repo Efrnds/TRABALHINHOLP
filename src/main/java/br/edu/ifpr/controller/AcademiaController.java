@@ -2,9 +2,13 @@ package br.edu.ifpr.controller;
 
 import br.edu.ifpr.dao.AcademiaDAO;
 import br.edu.ifpr.model.entity.Academia;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@RestController
+@RequestMapping("api/academia")
+@CrossOrigin(origins = "*")
 public class AcademiaController {
 
     private AcademiaDAO academiaDAO;
@@ -13,7 +17,8 @@ public class AcademiaController {
         this.academiaDAO = academiaDAO;
     }
 
-    public String cadastrarAcademia(String nome, int capacidade) {
+    @PostMapping
+    public String cadastrarAcademia(@RequestParam("nome") String nome,@RequestParam("capacidade") int capacidade) {
         if(nome ==null || nome.trim().isEmpty()){
             return "Nome da academia não pode ser vazio";
         }
@@ -30,7 +35,8 @@ public class AcademiaController {
         return "Academia cadastrada com sucesso";
     }
 
-    public String atualizarAcademia(int id, String novoNome, int novaCapacidade) {
+    @PutMapping("/{id}")
+    public String atualizarAcademia(@PathVariable int id,@RequestParam String novoNome,@RequestParam int novaCapacidade) {
         Academia academia = academiaDAO.buscarPorId(id);
         if (academia == null){
             return "Academia não encontrada";
@@ -43,7 +49,8 @@ public class AcademiaController {
         return "Academia atualizada com sucesso";
     }
 
-    public String excluirAcademia(int id) {
+    @DeleteMapping
+    public String excluirAcademia(@PathVariable int id) {
         Academia academia = academiaDAO.buscarPorId(id);
         if (academia == null){
             return "Academia não encontrada.";
@@ -53,10 +60,12 @@ public class AcademiaController {
         return "Academia deletada com sucesso";
     }
 
-    public Academia buscarPorId(int id){
+    @GetMapping("/{id}")
+    public Academia buscarPorId(@PathVariable int id){
         return academiaDAO.buscarPorId(id);
     }
 
+    @GetMapping
     public List<Academia> listarAcademia(){
         return academiaDAO.listarTodos();
     }

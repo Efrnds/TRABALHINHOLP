@@ -1,28 +1,32 @@
 package br.edu.ifpr.model.entity;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 
 @Entity
+@NamedQueries({
+        @NamedQuery(
+                name = "RegistroUso.somarMinutosPorAlunoHoje",
+                query = "SELECT COALESCE(SUM(r.duracao_min), 0) FROM RegistroUso r " +
+                        "WHERE r.aluno.id = :alunoId AND FUNCTION('DATE', r.dataHora) = FUNCTION('CURRENT_DATE')"
+        )
+})
 public class RegistroUso {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    @Basic
-    @Temporal(TemporalType.DATE)
     private LocalDateTime dataHora;
 
     @Basic
     private int duracao_min;
 
-    @ManyToMany
+    @ManyToOne
     @JoinColumn(name = "aluno_id")
     private Aluno aluno;
 
-    @ManyToMany
+    @ManyToOne
     @JoinColumn(name = "equipamento_id")
     private Equipamento equipamento;
 

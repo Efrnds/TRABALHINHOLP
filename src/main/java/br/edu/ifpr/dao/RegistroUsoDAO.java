@@ -1,75 +1,62 @@
 package br.edu.ifpr.dao;
 
-import br.edu.ifpr.enums.Status;
 import br.edu.ifpr.model.entity.RegistroUso;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Repository
 public class RegistroUsoDAO {
+
+    @PersistenceContext
     private EntityManager em;
 
-    public RegistroUsoDAO(EntityManager em) {
-        this.em = em;
-    }
-
+    @Transactional
     public void salvar(RegistroUso registroUso) {
-        em.getTransaction().begin();
         em.persist(registroUso);
-        em.getTransaction().commit();
     }
 
-    public void atualizar(RegistroUso  registroUso) {
-        em.getTransaction().begin();
+    @Transactional
+    public void atualizar(RegistroUso registroUso) {
         em.merge(registroUso);
-        em.getTransaction().commit();
     }
 
+    @Transactional
     public void deletar(RegistroUso registroUso) {
-        em.getTransaction().begin();
         if (!em.contains(registroUso)) {
             registroUso = em.merge(registroUso);
         }
         em.remove(registroUso);
-        em.getTransaction().commit();
     }
 
     public RegistroUso buscarPorId(int id) {
         return em.find(RegistroUso.class, id);
     }
 
-
     public List<RegistroUso> listarTodos() {
-        TypedQuery<RegistroUso> query = em.createQuery("SELECT e FROM RegistroUso e", RegistroUso.class);
+        TypedQuery<RegistroUso> query = em.createQuery("SELECT r FROM RegistroUso r", RegistroUso.class);
         return query.getResultList();
     }
 
     public int somarMinutosPorAlunoHoje(int alunoId) {
-        TypedQuery<Long> query = em.createQuery(
-                "SELECT COALESCE(SUM(r.duracaoMin), 0) FROM RegistroUso r " +
-                        "WHERE r.aluno.id = :id AND DATE(r.dataHora) = CURDATE()",
-                Long.class
-        );
-        query.setParameter("id", alunoId);
+        TypedQuery<Long> query = em.createNamedQuery("RegistroUso.somarMinutosPorAlunoHoje", Long.class);
+        query.setParameter("alunoId", alunoId);
         Long resultado = query.getSingleResult();
         return resultado != null ? resultado.intValue() : 0;
     }
-
 
     public int contarRegistrosAtivosAgora() {
-        TypedQuery<Long> query = em.createQuery(
-                "SELECT COUNT(r) FROM RegistroUso r " +
-                        "WHERE r.dataHora <= CURRENT_TIMESTAMP " +
-                        "AND FUNCTION('TIMESTAMPADD', 'MINUTE', r.duracaoMin, r.dataHora) > CURRENT_TIMESTAMP",
-                Long.class
-        );
-        Long resultado = query.getSingleResult();
-        return resultado != null ? resultado.intValue() : 0;
+        String sql = "SELECT COUNT(*) FROM registro_uso r " +
+                     "WHERE r.data_hora <= CURRENT_TIMESTAMP " +
+                     "AND DATE_ADD(r.data_hora, INTERVAL r.duracao_min MINUTE) > CURRENT_TIMESTAMP";
+
+        Query query = em.createNativeQuery(sql);
+        Number result = (Number) query.getSingleResult();
+        return result != null ? result.intValue() : 0;
     }
-
 }
-
-
-
-

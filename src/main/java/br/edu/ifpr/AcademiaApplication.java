@@ -7,5 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class AcademiaApplication {
     public static void main(String[] args) {
         SpringApplication.run(AcademiaApplication.class, args);
+        System.out.println("Servidor rodando na porta" + 8080);
     }
 }

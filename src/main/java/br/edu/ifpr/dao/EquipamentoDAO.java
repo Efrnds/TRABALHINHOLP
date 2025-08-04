@@ -3,36 +3,35 @@ package br.edu.ifpr.dao;
 import br.edu.ifpr.enums.Status;
 import br.edu.ifpr.model.entity.Equipamento;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Repository
 public class EquipamentoDAO {
+
+    @PersistenceContext
     private EntityManager em;
 
-    public EquipamentoDAO(EntityManager em) {
-        this.em = em;
-    }
-
+    @Transactional
     public void salvar(Equipamento equipamento) {
-        em.getTransaction().begin();
         em.persist(equipamento);
-        em.getTransaction().commit();
     }
 
-    public void atualizar(Equipamento  equipamento) {
-        em.getTransaction().begin();
+    @Transactional
+    public void atualizar(Equipamento equipamento) {
         em.merge(equipamento);
-        em.getTransaction().commit();
     }
 
+    @Transactional
     public void deletar(Equipamento equipamento) {
-        em.getTransaction().begin();
         if (!em.contains(equipamento)) {
             equipamento = em.merge(equipamento);
         }
         em.remove(equipamento);
-        em.getTransaction().commit();
     }
 
     public Equipamento buscarPorId(int id) {
@@ -49,7 +48,3 @@ public class EquipamentoDAO {
         return query.getResultList();
     }
 }
-
-
-
-

@@ -19,7 +19,7 @@ public class AlunoController {
     }
 
     @PostMapping
-    public String cadastrarAluno(String nome, Plano plano){
+    public String cadastrarAluno(@RequestParam("nome") String nome,@RequestParam("plano") Plano plano){
         if(nome == null || nome.isEmpty()){
             return "Nome do aluno não pode ser vazio";
         }
@@ -32,8 +32,8 @@ public class AlunoController {
         return "Aluno cadastrado com sucesso";
     }
 
-    @PostMapping("/{id}")
-    public String atualizarAluno(int id, String novoNome, Plano novoPlano){
+    @PutMapping("/{id}")
+    public String atualizarAluno(@PathVariable int id,@RequestParam String novoNome,@RequestParam Plano novoPlano){
         Aluno aluno = alunoDAO.buscarPorId(id);
         if(aluno == null){
             return "Aluno não encontrado";
@@ -47,7 +47,7 @@ public class AlunoController {
     }
 
     @DeleteMapping
-    public String excluirAluno(int id){
+    public String excluirAluno(@PathVariable int id){
         Aluno aluno = alunoDAO.buscarPorId(id);
         if(aluno == null){
             return "Aluno não encontrado";
@@ -58,7 +58,7 @@ public class AlunoController {
     }
 
     @GetMapping("/{id}")
-    public Aluno buscarAlunoPorId(int id){
+    public Aluno buscarAlunoPorId(@PathVariable int id){
         return alunoDAO.buscarPorId(id);
     }
 

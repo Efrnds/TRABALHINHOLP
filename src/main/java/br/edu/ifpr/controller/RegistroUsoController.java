@@ -9,16 +9,20 @@ import br.edu.ifpr.model.entity.Equipamento;
 import br.edu.ifpr.model.entity.RegistroUso;
 import br.edu.ifpr.enums.Plano;
 import br.edu.ifpr.enums.Status;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@RestController
+@RequestMapping("api/registro-uso")
+@CrossOrigin(origins = "*")
 public class RegistroUsoController {
 
-    private RegistroUsoDAO registroUsoDAO;
-    private AlunoDAO alunoDAO;
-    private EquipamentoDAO equipamentoDAO;
-    private AcademiaDAO academiaDAO;
+    private final RegistroUsoDAO registroUsoDAO;
+    private final AlunoDAO alunoDAO;
+    private final EquipamentoDAO equipamentoDAO;
+    private final AcademiaDAO academiaDAO;
 
     public RegistroUsoController(
             RegistroUsoDAO registroUsoDAO,
@@ -32,29 +36,38 @@ public class RegistroUsoController {
         this.academiaDAO = academiaDAO;
     }
 
-    public String registrarUso(int alunoId, int equipamentoId, int duracaoMin){
+    @PostMapping
+    public String registrarUso(
+            @RequestParam("alunoId") int alunoId,
+            @RequestParam("equipamentoId") int equipamentoId,
+            @RequestParam("duracaoMin") int duracaoMin) {
+
         Aluno aluno = alunoDAO.buscarPorId(alunoId);
         Equipamento equipamento = equipamentoDAO.buscarPorId(equipamentoId);
 
-//        verifica se o equipamento está disponível
-        if  (equipamento.getStatus() != Status.DISPONIVEL) {
+        if (aluno == null || equipamento == null) {
+            return "Aluno ou equipamento não encontrado.";
+        }
+
+        if (equipamento.getStatus() != Status.DISPONIVEL) {
             return "Equipamento em manutenção. Escolha outro.";
         }
 
-//        verificar o tempo usado hoje
         int minutosHoje = registroUsoDAO.somarMinutosPorAlunoHoje(alunoId);
         if (aluno.getPlano() == Plano.BASICO && (minutosHoje + duracaoMin) > 60) {
             return "Aluno com plano BÁSICO só pode treinar 60min por dia!";
         }
 
-//        verificar capacidade atual
+        if (equipamento.getAcademia() == null) {
+            return "Erro: equipamento sem academia vinculada.";
+        }
+
         int capacidadeMaxima = equipamento.getAcademia().getCapacidade();
         int ativosAgora = registroUsoDAO.contarRegistrosAtivosAgora();
-        if (ativosAgora > capacidadeMaxima) {
+        if (ativosAgora >= capacidadeMaxima) {
             return "Academia cheia. Aguarde vaga.";
         }
 
-//        criar novo registro
         RegistroUso registroUso = new RegistroUso();
         registroUso.setAluno(aluno);
         registroUso.setEquipamento(equipamento);
@@ -65,11 +78,13 @@ public class RegistroUsoController {
         return "Uso registrado com sucesso.";
     }
 
-    public List<RegistroUso> listarRegistros(){
+    @GetMapping
+    public List<RegistroUso> listarRegistros() {
         return registroUsoDAO.listarTodos();
     }
 
-    public void excluirRegistro(int id){
+    @DeleteMapping("/{id}")
+    public void excluirRegistro(@PathVariable(name = "id") int id) {
         RegistroUso r = registroUsoDAO.buscarPorId(id);
         if (r != null) {
             registroUsoDAO.deletar(r);

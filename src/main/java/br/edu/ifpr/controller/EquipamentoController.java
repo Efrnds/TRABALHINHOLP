@@ -1,35 +1,52 @@
 package br.edu.ifpr.controller;
 
+import br.edu.ifpr.dao.AcademiaDAO;
+import br.edu.ifpr.model.entity.Academia;
 import br.edu.ifpr.model.entity.Equipamento;
 import br.edu.ifpr.dao.EquipamentoDAO;
 import br.edu.ifpr.enums.Status;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@RestController
+@RequestMapping("/api/equipamentos")
+@CrossOrigin(origins = "*")
 public class EquipamentoController {
 
-    private EquipamentoDAO equipamentoDAO;
+    private final EquipamentoDAO equipamentoDAO;
+    private final AcademiaDAO academiaDAO;
 
-    public EquipamentoController(EquipamentoDAO equipamentoDAO) {
+    public EquipamentoController(EquipamentoDAO equipamentoDAO, AcademiaDAO academiaDAO) {
         this.equipamentoDAO = equipamentoDAO;
+        this.academiaDAO = academiaDAO;
     }
 
-    public String cadastrarEquipamento(String nome, Status status){
-        if(nome == null || nome.trim().isEmpty()){
+    @PostMapping
+    public String cadastrarEquipamento(@RequestParam("nome") String nome, @RequestParam("status") Status status, @RequestParam("academia_id") int academiaId) {
+        Academia academia = academiaDAO.buscarPorId(academiaId);
+        if (academia == null) {
+            return "Academia não encontrada";
+        }
+        if (nome == null || nome.trim().isEmpty()) {
             return "Nome do equipamento não pode ser vazio.";
         }
 
         Equipamento equipamento = new Equipamento();
         equipamento.setNome(nome);
         equipamento.setStatus(status);
+        equipamento.setAcademia(academia);
 
         equipamentoDAO.salvar(equipamento);
-        return "Equipamento Cadastrado com sucesso!";
+        return "Equipamento cadastrado com sucesso!";
     }
 
-    public String atualizarEquipamento(int id, String novoNome, Status novoStatus){
+    @PutMapping("/{id}")
+    public String atualizarEquipamento(@PathVariable int id,
+                                       @RequestParam String novoNome,
+                                       @RequestParam Status novoStatus) {
         Equipamento equipamento = equipamentoDAO.buscarPorId(id);
-        if (equipamento == null){
+        if (equipamento == null) {
             return "Equipamento não encontrado";
         }
 
@@ -37,30 +54,34 @@ public class EquipamentoController {
         equipamento.setStatus(novoStatus);
 
         equipamentoDAO.atualizar(equipamento);
-        return "Equipamento Atualizado com sucesso!";
+        return "Equipamento atualizado com sucesso!";
     }
 
-    public String excluirEquipamento(int id){
+    @DeleteMapping("/{id}")
+    public String excluirEquipamento(@PathVariable int id) {
         Equipamento equipamento = equipamentoDAO.buscarPorId(id);
-        if (equipamento == null){
+        if (equipamento == null) {
             return "Equipamento não encontrado";
         }
 
         equipamentoDAO.deletar(equipamento);
-        return "Equipamento Deletado com sucesso!";
+        return "Equipamento deletado com sucesso!";
     }
 
-    public Equipamento buscarEquipamentoPorId(int id){
+    @GetMapping("/{id}")
+    public Equipamento buscarEquipamentoPorId(@PathVariable int id) {
         return equipamentoDAO.buscarPorId(id);
     }
 
-    public List<Equipamento> buscarEquipamentos(){
+    @GetMapping
+    public List<Equipamento> buscarEquipamentos() {
         return equipamentoDAO.listarTodos();
     }
 
-    public String alternarStatus(int id) {
+    @PutMapping("/alternar-status/{id}")
+    public String alternarStatus(@PathVariable int id) {
         Equipamento equipamento = equipamentoDAO.buscarPorId(id);
-        if (equipamento == null){
+        if (equipamento == null) {
             return "Equipamento não encontrado";
         }
 
