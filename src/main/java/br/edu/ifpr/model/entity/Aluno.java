@@ -14,6 +14,7 @@ public class Aluno {
     private String nome;
 
     @Enumerated(EnumType.STRING)
+    @Column(length = 20)
     private Plano plano;
 
     public int getId() {

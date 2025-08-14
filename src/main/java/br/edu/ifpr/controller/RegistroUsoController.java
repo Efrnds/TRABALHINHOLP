@@ -9,6 +9,7 @@ import br.edu.ifpr.model.entity.Equipamento;
 import br.edu.ifpr.model.entity.RegistroUso;
 import br.edu.ifpr.enums.Plano;
 import br.edu.ifpr.enums.Status;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -37,6 +38,7 @@ public class RegistroUsoController {
     }
 
     @PostMapping
+    @Transactional
     public String registrarUso(
             @RequestParam("alunoId") int alunoId,
             @RequestParam("equipamentoId") int equipamentoId,
@@ -84,6 +86,7 @@ public class RegistroUsoController {
     }
 
     @DeleteMapping("/{id}")
+    @Transactional
     public void excluirRegistro(@PathVariable(name = "id") int id) {
         RegistroUso r = registroUsoDAO.buscarPorId(id);
         if (r != null) {

@@ -15,17 +15,14 @@ public class AcademiaDAO {
     @PersistenceContext
     private EntityManager em;
 
-    @Transactional
     public void salvar(Academia academia) {
         em.persist(academia);
     }
 
-    @Transactional
     public void atualizar(Academia academia) {
         em.merge(academia);
     }
 
-    @Transactional
     public void deletar(Academia academia) {
         if (!em.contains(academia)) {
             academia = em.merge(academia);

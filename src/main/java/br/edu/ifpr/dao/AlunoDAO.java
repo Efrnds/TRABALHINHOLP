@@ -5,7 +5,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -15,17 +14,14 @@ public class AlunoDAO {
     @PersistenceContext
     private EntityManager em;
 
-    @Transactional
     public void salvar(Aluno aluno) {
         em.persist(aluno);
     }
 
-    @Transactional
     public void atualizar(Aluno aluno) {
         em.merge(aluno);
     }
 
-    @Transactional
     public void deletar(Aluno aluno) {
         if (!em.contains(aluno)) {
             aluno = em.merge(aluno);

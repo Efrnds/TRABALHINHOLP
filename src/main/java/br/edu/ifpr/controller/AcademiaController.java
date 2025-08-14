@@ -2,6 +2,7 @@ package br.edu.ifpr.controller;
 
 import br.edu.ifpr.dao.AcademiaDAO;
 import br.edu.ifpr.model.entity.Academia;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class AcademiaController {
     }
 
     @PostMapping
+    @Transactional
     public String cadastrarAcademia(@RequestParam("nome") String nome,@RequestParam("capacidade") int capacidade) {
         if(nome ==null || nome.trim().isEmpty()){
             return "Nome da academia não pode ser vazio";
@@ -36,6 +38,7 @@ public class AcademiaController {
     }
 
     @PutMapping("/{id}")
+    @Transactional
     public String atualizarAcademia(@PathVariable int id,@RequestParam String novoNome,@RequestParam int novaCapacidade) {
         Academia academia = academiaDAO.buscarPorId(id);
         if (academia == null){
@@ -49,7 +52,8 @@ public class AcademiaController {
         return "Academia atualizada com sucesso";
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
+    @Transactional
     public String excluirAcademia(@PathVariable int id) {
         Academia academia = academiaDAO.buscarPorId(id);
         if (academia == null){

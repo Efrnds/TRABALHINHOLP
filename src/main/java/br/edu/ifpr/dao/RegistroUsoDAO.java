@@ -6,7 +6,6 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -16,17 +15,14 @@ public class RegistroUsoDAO {
     @PersistenceContext
     private EntityManager em;
 
-    @Transactional
     public void salvar(RegistroUso registroUso) {
         em.persist(registroUso);
     }
 
-    @Transactional
     public void atualizar(RegistroUso registroUso) {
         em.merge(registroUso);
     }
 
-    @Transactional
     public void deletar(RegistroUso registroUso) {
         if (!em.contains(registroUso)) {
             registroUso = em.merge(registroUso);
